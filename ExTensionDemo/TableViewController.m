@@ -24,42 +24,11 @@
     [self createAddBtn];
     self.dataArray = [NSMutableArray new];
     [self.tableView registerClass:[UITableViewCell class] forCellReuseIdentifier:@"UITableViewCell"];
-    
-    //1.获得数据库文件的路径
-    NSString *doc =[NSSearchPathForDirectoriesInDomains(NSDocumentDirectory,NSUserDomainMask, YES)  lastObject];
-    NSString *fileName = [doc stringByAppendingPathComponent:@"GYTodo.sqlite"];
-    //2.获得数据库
-    self.db = [FMDatabase databaseWithPath:fileName];
-    //3.使用如下语句，如果打开失败，可能是权限不足或者资源不足。通常打开完操作操作后，需要调用 close 方法来关闭数据库。在和数据库交互 之前，数据库必须是打开的。如果资源或权限不足无法打开或创建数据库，都会导致打开失败。
-    if ([_db open])
-    {
-        //4.创表
-        BOOL result = [_db executeUpdate:@"CREATE TABLE IF NOT EXISTS GYTodo (id integer PRIMARY KEY AUTOINCREMENT, content text NOT NULL);"];
-        if (result)
-        {
-            NSLog(@"创建表成功");
-        }
-    }
-    [self checkTable];
+    [self checkTableArr];
 }
 
 //查询
-- (void)checkTable{
-//    //查询整个表
-//    FMResultSet *resultSet = [self.db executeQuery:@"select * from GYTodo;"];
-//    [self.dataArray removeAllObjects];
-//    //遍历结果集合
-//    while ([resultSet next])
-//    {
-//        int idNum = [resultSet intForColumn:@"id"];
-//        NSString *content = [resultSet objectForColumn:@"content"];
-//        GYTodo *todo = [GYTodo new];
-//        todo.id = idNum;
-//        todo.content = content;
-//        [self.dataArray addObject:todo];
-//        [self.tableView reloadData];
-//    }
-    
+- (void)checkTableArr{
     [self.dataArray removeAllObjects];
     [self.dataArray addObjectsFromArray:[GYFMDBMANAGERX(@"GYTodo") fl_searchModelArr:[GYTodo class]]];
     [self.tableView reloadData];
@@ -67,8 +36,7 @@
 
 //增加
 - (BOOL)addData:(GYTodo*)todo{
-    //1.executeUpdate:不确定的参数用？来占位（后面参数必须是oc对象，；代表语句结束）
-    if ([_db executeUpdate:@"INSERT INTO GYTodo (content) VALUES (?);",todo.content]) {
+    if ([GYFMDBMANAGERX(@"GYTodo") fl_insertModel:todo]) {
         return true;
     }
     return false;
@@ -98,7 +66,7 @@
                                                               GYTodo *todo = [GYTodo new];
                                                               todo.content = todoTextField.text;
                                                               if ([weakSelf addData:todo]){
-                                                                  [weakSelf checkTable];
+                                                                  [weakSelf checkTableArr];
                                                               }
                                                           }];
     UIAlertAction* cancelAction = [UIAlertAction actionWithTitle:@"取消"

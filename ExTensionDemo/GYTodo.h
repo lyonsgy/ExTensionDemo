@@ -11,8 +11,9 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @interface GYTodo : NSObject
-@property (nonatomic) int id;
+@property (nonatomic) NSInteger id;
 @property (nonatomic, strong) NSString *content;
+
 @end
 
 NS_ASSUME_NONNULL_END

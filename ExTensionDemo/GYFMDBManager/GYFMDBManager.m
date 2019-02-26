@@ -86,9 +86,6 @@
     return  [self fl_searchModelArr:modelClass autoCloseDB:YES];
 }
 
-
-
-
 - (BOOL)fl_modifyModel:(id)model byID:(NSString *)FLDBID{
     return [self fl_modifyModel:model byID:FLDBID autoCloseDB:YES];
 }
@@ -196,12 +193,17 @@
         if([[key substringToIndex:1] isEqualToString:@"_"]){
             key = [key stringByReplacingCharactersInRange:NSMakeRange(0, 1) withString:@""];
         }
-        
-        if (i == 0) {
-            [sqlValueM appendString:key];
-        }
-        else{
-            [sqlValueM appendFormat:@", %@",key];
+        //如果 key 为 id，在插入方法内不判断重复，直接插入
+        if (![key isEqualToString:@"id"]) {
+            if (i == 0) {
+                [sqlValueM appendString:[key isEqualToString:@"id"]?@"":key];
+            }
+            else{
+                [sqlValueM appendFormat:@"%@",key];
+            }
+            if (i < outCount-1) {
+                [sqlValueM appendString:@", "];
+            }
         }
     }
     [sqlValueM appendString:@") VALUES ("];
@@ -217,12 +219,18 @@
         if ([value isKindOfClass:[NSDictionary class]] || [value isKindOfClass:[NSMutableDictionary class]] || [value isKindOfClass:[NSArray class]] || [value isKindOfClass:[NSMutableArray class]]) {
             value = [NSString stringWithFormat:@"%@",value];
         }
-        if (i == 0) {
-            // sql 语句中字符串需要单引号或者双引号括起来
-            [sqlValueM appendFormat:@"%@",[value isKindOfClass:[NSString class]] ? [NSString stringWithFormat:@"'%@'",value] : value];
-        }
-        else{
-            [sqlValueM appendFormat:@", %@",[value isKindOfClass:[NSString class]] ? [NSString stringWithFormat:@"'%@'",value] : value];
+        //如果 key 为 id，在插入方法内不判断重复，直接插入
+        if (![key isEqualToString:@"id"]) {
+            if (i == 0) {
+                // sql 语句中字符串需要单引号或者双引号括起来
+                [sqlValueM appendFormat:@"%@",[value isKindOfClass:[NSString class]] ? [NSString stringWithFormat:@"'%@'",value] : value];
+            }
+            else{
+                [sqlValueM appendFormat:@"%@",[value isKindOfClass:[NSString class]] ? [NSString stringWithFormat:@"'%@'",value] : value];
+            }
+            if (i < outCount-1) {
+                [sqlValueM appendString:@", "];
+            }
         }
     }
     //    [sqlValueM appendFormat:@" WHERE FLDBID = '%@'",[model valueForKey:@"FLDBID"]];
@@ -337,10 +345,10 @@
         }
         // 已经创建有对应的表，直接插入
         else{
-            NSString *fl_dbid = [model valueForKey:@"FLDBID"];
+            NSString *fl_dbid = [model valueForKey:@"id"];
             id judgeModle = [self fl_searchModel:[model class] byID:fl_dbid autoCloseDB:NO];
             
-            if ([[judgeModle valueForKey:@"FLDBID"] isEqualToString:fl_dbid]) {
+            if ([[judgeModle valueForKey:@"id"] isEqualToString:fl_dbid]) {
                 BOOL updataSuccess = [self fl_modifyModel:model byID:fl_dbid autoCloseDB:NO];
                 if (autoCloseDB) {
                     [FLCURRENTDB close];
