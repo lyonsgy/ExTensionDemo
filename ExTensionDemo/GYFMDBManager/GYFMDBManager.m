@@ -137,7 +137,7 @@
         if(![self isExitTable:modelClass autoCloseDB:NO])return NO;
         if ([self fl_searchModel:modelClass byID:FLDBID autoCloseDB:NO]) {
             // 删除数据
-            NSMutableString *sql = [NSMutableString stringWithFormat:@"DELETE FROM %@ WHERE  FLDBID = '%@';",modelClass,FLDBID];
+            NSMutableString *sql = [NSMutableString stringWithFormat:@"DELETE FROM %@ WHERE  id = '%@';",modelClass,FLDBID];
             BOOL success = [FLCURRENTDB executeUpdate:sql];
             [FLCURRENTDB close];
             return success;
@@ -161,8 +161,9 @@
  *  创建表的SQL语句
  */
 - (NSString *)createTableSQL:(Class)modelClass{
-    NSMutableString *sqlPropertyM = [NSMutableString stringWithFormat:@"CREATE TABLE IF NOT EXISTS %@ (id INTEGER PRIMARY KEY AUTOINCREMENT ",modelClass];
-    
+    NSMutableString *sqlPropertyM = [NSMutableString stringWithFormat:@"CREATE TABLE IF NOT EXISTS %@ (id INTEGER PRIMARY KEY AUTOINCREMENT",modelClass];
+//    BOOL result = [_db executeUpdate:@"CREATE TABLE IF NOT EXISTS GYTodo (id integer PRIMARY KEY AUTOINCREMENT, content text NOT NULL);"];
+
     unsigned int outCount;
     Ivar * ivars = class_copyIvarList(modelClass, &outCount);
     for (int i = 0; i < outCount; i ++) {
@@ -171,7 +172,12 @@
         if([[key substringToIndex:1] isEqualToString:@"_"]){
             key = [key stringByReplacingCharactersInRange:NSMakeRange(0, 1) withString:@""];
         }
-        [sqlPropertyM appendFormat:@", %@",key];
+        if (![key isEqualToString:@"id"]) {
+            [sqlPropertyM appendFormat:@"%@",key];
+        }
+        if (i < outCount - 1) {
+            [sqlPropertyM appendFormat:@", "];
+        }
     }
     [sqlPropertyM appendString:@")"];
     
@@ -315,10 +321,10 @@
             // 第二步处理完不关闭数据库
             BOOL success = [self fl_createTable:[model class] autoCloseDB:NO];
             if (success) {
-                NSString *fl_dbid = [model valueForKey:@"FLDBID"];
+                NSString *fl_dbid = [model valueForKey:@"id"];
                 id judgeModle = [self fl_searchModel:[model class] byID:fl_dbid autoCloseDB:NO];
                 
-                if ([[judgeModle valueForKey:@"FLDBID"] isEqualToString:fl_dbid]) {
+                if ([[judgeModle valueForKey:@"id"] isEqualToString:fl_dbid]) {
                     BOOL updataSuccess = [self fl_modifyModel:model byID:fl_dbid autoCloseDB:NO];
                     if (autoCloseDB) {
                         [FLCURRENTDB close];
@@ -406,18 +412,16 @@
                     key = [key stringByReplacingCharactersInRange:NSMakeRange(0, 1) withString:@""];
                 }
                 
-                id value = [rs objectForColumnName:key];
+                id value = [rs objectForColumn:key];
                 if ([value isKindOfClass:[NSString class]]) {
                     NSData *data = [value dataUsingEncoding:NSUTF8StringEncoding];
                     id result = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
                     if ([result isKindOfClass:[NSDictionary class]] || [result isKindOfClass:[NSMutableDictionary class]] || [result isKindOfClass:[NSArray class]] || [result isKindOfClass:[NSMutableArray class]]) {
                         [object setValue:result forKey:key];
-                    }
-                    else{
+                    }else{
                         [object setValue:value forKey:key];
                     }
-                }
-                else{
+                }else{
                     [object setValue:value forKey:key];
                 }
             }
@@ -445,7 +449,7 @@
             return nil;
         }
         // 查询数据
-        FMResultSet *rs = [FLCURRENTDB executeQuery:[NSString stringWithFormat:@"SELECT * FROM %@ WHERE FLDBID = '%@';",modelClass,FLDBID]];
+        FMResultSet *rs = [FLCURRENTDB executeQuery:[NSString stringWithFormat:@"SELECT * FROM %@ WHERE id = '%@';",modelClass,FLDBID]];
         // 创建对象
         id object = nil;
         // 遍历结果集
@@ -528,7 +532,7 @@
             }
         }
         
-        [sql appendFormat:@" WHERE FLDBID = '%@';",FLDBID];
+        [sql appendFormat:@" WHERE id = '%@';",FLDBID];
         BOOL success = [FLCURRENTDB executeUpdate:sql];
         if (autoCloseDB) {
             [FLCURRENTDB close];
