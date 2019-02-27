@@ -19,6 +19,47 @@
 @end
 
 @implementation GYFMDBManager
++ (instancetype)shareManagerWithGroupFileName:(NSString *)fl_dbName{
+    NSString *tempDBName = nil;
+    if (fl_dbName && ![fl_dbName isEqualToString:@""]) {
+        tempDBName = fl_dbName;
+    }else{
+        tempDBName = @"todoList";
+    }
+    
+    //1、获取App Group沙盒中数据库的路径
+    NSURL *groupURL = [[NSFileManager defaultManager] containerURLForSecurityApplicationGroupIdentifier:@"group.test.app.group.main"];
+    NSURL *fileURL = [groupURL URLByAppendingPathComponent:[tempDBName stringByAppendingString:@".sqlite"]];
+    NSString *sqlFilePath = [NSString stringWithFormat:@"%@",fileURL];
+    
+    // 2、判断 caches 文件夹是否存在.不存在则创建
+    NSFileManager *manager = [NSFileManager defaultManager];
+    BOOL isDirectory = YES;
+    BOOL tag = [manager fileExistsAtPath:sqlFilePath isDirectory:&isDirectory];
+    
+    static GYFMDBManager *instance;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        instance = [[self alloc] init];
+        instance.dataBaseDictM = [NSMutableDictionary dictionary];
+        if (tag) {
+            FMDatabase *dataBase = [FMDatabase databaseWithPath:sqlFilePath];
+            [instance.dataBaseDictM setValue:dataBase forKey:tempDBName];
+        }
+    });
+    
+    if (!tag) {
+        [manager createDirectoryAtPath:[NSString stringWithFormat:@"%@",groupURL] withIntermediateDirectories:YES attributes:nil error:NULL];
+        // 通过路径创建数据库
+        FMDatabase *dataBase = [FMDatabase databaseWithPath:sqlFilePath];
+        [instance.dataBaseDictM setValue:dataBase forKey:tempDBName];
+    }
+    
+    instance.dbName = tempDBName;
+    
+    return instance;
+}
+
 + (instancetype)shareManager:(NSString *)fl_dbName{
     //1、获取沙盒中数据库的路径
     NSString *path = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES).lastObject;

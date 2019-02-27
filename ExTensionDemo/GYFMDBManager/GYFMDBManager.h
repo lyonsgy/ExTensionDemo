@@ -12,6 +12,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface GYFMDBManager : NSObject
 /**
+ 保存在 app group 中的单例创建，项目唯一
+ */
++ (instancetype)shareManagerWithGroupFileName:(NSString *)fl_dbName;
+/**
  *  @author Clarence
  *
  *  单例创建，项目唯一
