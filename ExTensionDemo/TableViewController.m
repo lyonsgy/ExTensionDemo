@@ -30,13 +30,13 @@
 //查询
 - (void)checkTableArr{
     [self.dataArray removeAllObjects];
-    [self.dataArray addObjectsFromArray:[GYFMDBMANAGERX(@"GYTodo") fl_searchModelArr:[GYTodo class]]];
+    [self.dataArray addObjectsFromArray:[GYFMDBMANAGERG(@"GYTodo") fl_searchModelArr:[GYTodo class]]];
     [self.tableView reloadData];
 }
 
 //增加
 - (BOOL)addData:(GYTodo*)todo{
-    if ([GYFMDBMANAGERX(@"GYTodo") fl_insertModel:todo]) {
+    if ([GYFMDBMANAGERG(@"GYTodo") fl_insertModel:todo]) {
         return true;
     }
     return false;
