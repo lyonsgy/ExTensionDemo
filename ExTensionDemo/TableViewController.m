@@ -24,6 +24,7 @@
     [self createAddBtn];
     self.dataArray = [NSMutableArray new];
     [self.tableView registerClass:[UITableViewCell class] forCellReuseIdentifier:@"UITableViewCell"];
+    //    [self.tableView setEditing:true animated:false];
     [self checkTableArr];
 }
 -(void)viewWillAppear:(BOOL)animated
@@ -34,6 +35,7 @@
 -(void)viewWillDisappear:(BOOL)animated
 {
     [super viewWillDisappear:animated];
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:kNEW_TODO_NOTIFICATION object:nil];
 }
 //查询
 - (void)checkTableArr{
@@ -52,6 +54,7 @@
 
 - (void)createAddBtn{
     UIButton *cancleButton = [UIButton buttonWithType:UIButtonTypeSystem];
+    cancleButton.frame = CGRectMake(0, 0, 60, 44);
     [cancleButton setTitle:@"添加" forState:UIControlStateNormal];
     [cancleButton addTarget:self action:@selector(addTodo:) forControlEvents:UIControlEventTouchUpInside];
     
@@ -61,7 +64,6 @@
 }
 
 - (void)addTodo:(id)sender{
-    [[NSNotificationCenter defaultCenter] removeObserver:self name:kNEW_TODO_NOTIFICATION object:nil];
     UIAlertController* alert = [UIAlertController alertControllerWithTitle:@"添加Todo"
                                                                    message:nil
                                                             preferredStyle:UIAlertControllerStyleAlert];
@@ -95,16 +97,29 @@
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
     return 1;
 }
-
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     return self.dataArray.count;
 }
-
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"UITableViewCell" forIndexPath:indexPath];
     GYTodo *todo = _dataArray[indexPath.row];
     cell.textLabel.text = todo.content;
     return cell;
+}
+-(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
+    [tableView deselectRowAtIndexPath:indexPath animated:true];
+}
+-(void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath{
+    if (editingStyle ==UITableViewCellEditingStyleDelete) {//如果编辑样式为删除样式
+        GYTodo *todo = _dataArray[indexPath.row];
+        if ([GYFMDBMANAGERG(@"GYTodo") fl_deleteModel:[GYTodo class] byId:[NSString stringWithFormat:@"%ld",(long)todo.id]]) {
+            [self.dataArray removeObjectAtIndex:indexPath.row];
+            [self.tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade];
+        }else{
+            NSLog(@"删除失败");
+        }
+    }
+    
 }
 
 @end
