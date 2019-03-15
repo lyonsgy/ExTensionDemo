@@ -1,0 +1,15 @@
+//
+//  PrefixHeader.pch
+//  ExTensionDemo
+//
+//  Created by lyons on 2019/3/15.
+//  Copyright © 2019 lyons. All rights reserved.
+//
+
+#ifndef PrefixHeader_pch
+#define PrefixHeader_pch
+
+#define kNEW_TODO_NOTIFICATION @"NewTodoNotification" //Slogan
+
+
+#endif /* PrefixHeader_pch */

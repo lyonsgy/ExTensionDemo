@@ -98,6 +98,7 @@
 		2B675DCC22267FC900D9D7DC /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/MainInterface.storyboard; sourceTree = "<group>"; };
 		2B675DCE22267FC900D9D7DC /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		2B675DD62226803400D9D7DC /* TodayList.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = TodayList.entitlements; sourceTree = "<group>"; };
+		2B7597C3223B7CE200F99A92 /* PrefixHeader.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PrefixHeader.pch; sourceTree = "<group>"; };
 		2BB23FFF2223D7C600F0C106 /* libsqlite3.0.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libsqlite3.0.tbd; path = usr/lib/libsqlite3.0.tbd; sourceTree = SDKROOT; };
 		2BB240012223D7CE00F0C106 /* ExTensionDemo.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ExTensionDemo.entitlements; sourceTree = "<group>"; };
 		2BB240022223D88B00F0C106 /* GYTodo.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GYTodo.h; sourceTree = "<group>"; };
@@ -190,6 +191,7 @@
 				2B5C94DC222393EB00508F4A /* main.m */,
 				2B5C94CD222393E900508F4A /* AppDelegate.h */,
 				2B5C94CE222393E900508F4A /* AppDelegate.m */,
+				2B7597C3223B7CE200F99A92 /* PrefixHeader.pch */,
 				2B5C95052223C63400508F4A /* RootNavigationController.h */,
 				2B5C95062223C63400508F4A /* RootNavigationController.m */,
 				2B5C95022223C28800508F4A /* TableViewController.h */,
@@ -721,6 +723,8 @@
 				CODE_SIGN_ENTITLEMENTS = ExTensionDemo/ExTensionDemo.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 79MZ7A623K;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "$(SRCROOT)/ExTensionDemo/PrefixHeader.pch";
 				INFOPLIST_FILE = ExTensionDemo/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -740,6 +744,8 @@
 				CODE_SIGN_ENTITLEMENTS = ExTensionDemo/ExTensionDemo.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 79MZ7A623K;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "$(SRCROOT)/ExTensionDemo/PrefixHeader.pch";
 				INFOPLIST_FILE = ExTensionDemo/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",

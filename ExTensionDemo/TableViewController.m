@@ -26,7 +26,15 @@
     [self.tableView registerClass:[UITableViewCell class] forCellReuseIdentifier:@"UITableViewCell"];
     [self checkTableArr];
 }
-
+-(void)viewWillAppear:(BOOL)animated
+{
+    [super viewWillAppear:animated];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(addTodo:) name:kNEW_TODO_NOTIFICATION object:nil];
+}
+-(void)viewWillDisappear:(BOOL)animated
+{
+    [super viewWillDisappear:animated];
+}
 //查询
 - (void)checkTableArr{
     [self.dataArray removeAllObjects];
@@ -53,6 +61,7 @@
 }
 
 - (void)addTodo:(id)sender{
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:kNEW_TODO_NOTIFICATION object:nil];
     UIAlertController* alert = [UIAlertController alertControllerWithTitle:@"添加Todo"
                                                                    message:nil
                                                             preferredStyle:UIAlertControllerStyleAlert];
